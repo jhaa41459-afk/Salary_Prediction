@@ -10,21 +10,49 @@ import streamlit as st
 import pandas as pd
 import joblib
 
-# Load model and encoder
-model = joblib.load("salary_prediction_model(1).pk1")
-encoder = joblib.load("label_encoder_sp.pkl")
+# ==============================
+# Load model and encoders
+# ==============================
+model = joblib.load("salary_prediction_model(1).pkl")
+encoders = joblib.load("label_encoder_sp.pkl")
 
-st.title("Salary Prediction App")
+# ==============================
+# App Title
+# ==============================
+st.set_page_config(page_title="Salary Prediction App")
+st.title("💼 Salary Prediction App")
 
-# Inputs
-age = st.number_input("Age", 18, 65, 25)
-gender = st.selectbox("Gender", ("male", "female"))
-education = st.selectbox("Education Level", encoder["Education Level"].classes)
-job = st.selectbox("Job Title", encoder["Job Title"].classes)
-experience = st.number_input("Years of Experience", 0.0, 40.8, 2.0)
+# ==============================
+# User Inputs
+# ==============================
+age = st.number_input("Age", min_value=18, max_value=65, value=25)
 
-# Create DataFrame
-df = pd.DataFrame({
+gender = st.selectbox(
+    "Gender",
+    encoders["gender"].classes_
+)
+
+education = st.selectbox(
+    "Education Level",
+    encoders["education"].classes_
+)
+
+job = st.selectbox(
+    "Job Title",
+    encoders["job"].classes_
+)
+
+experience = st.number_input(
+    "Years of Experience",
+    min_value=0.0,
+    max_value=40.0,
+    value=2.0
+)
+
+# ==============================
+# Create Input DataFrame
+# ==============================
+input_df = pd.DataFrame({
     "age": [age],
     "gender": [gender],
     "education": [education],
@@ -32,14 +60,21 @@ df = pd.DataFrame({
     "Years of Experience": [experience]
 })
 
+# ==============================
 # Prediction
+# ==============================
 if st.button("Predict Salary"):
-    for col in encoder.columns:
-        df[col] = encoder[col].transform(df[col])
-    
-    prediction = model.predict(df)
-    result = ["High Salary" if prediction[0] > 50000 else "Low Salary"]
-    
-    st.success(f"Predicted Salary: {prediction[0]:,.2f}")
-    st.success(f"Result: {result[0]}")
+    # Encode categorical columns
+    input_df["gender"] = encoders["gender"].transform(input_df["gender"])
+    input_df["education"] = encoders["education"].transform(input_df["education"])
+    input_df["job"] = encoders["job"].transform(input_df["job"])
 
+    # Predict
+    prediction = model.predict(input_df)
+
+    # Result label (optional)
+    result = "High Salary" if prediction[0] > 50000 else "Low Salary"
+
+    # Display results
+    st.success(f"💰 Predicted Salary: ₹{prediction[0]:,.2f}")
+    st.info(f"📊 Result: {result}")
