@@ -10,8 +10,11 @@ Original file is located at
 import streamlit as st
 import pandas as pd
 import joblib
-
-model= joblib.load("salary_prediction_model.pk1")
+# Get current directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Load model and encoders safely
+model = joblib.load(os.path.join(BASE_DIR, "salary_prediction_model.pkl"))
+encoders = joblib.load(os.path.join(BASE_DIR, "label_encoder_sp.pkl"))model= joblib.load("salary_prediction_model.pk1")
 encoder = joblib.load("label_encoder_sp.pkl")
 
 st.title("Salary Prediction App")
