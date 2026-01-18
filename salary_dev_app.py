@@ -9,72 +9,40 @@ Original file is located at
 import streamlit as st
 import pandas as pd
 import joblib
+import os
 
 # ==============================
-# Load model and encoders
+# Page config
 # ==============================
-model = joblib.load("salary_prediction_model(1).pkl")
-encoders = joblib.load("label_encoder_sp.pkl")
-
-# ==============================
-# App Title
-# ==============================
-st.set_page_config(page_title="Salary Prediction App")
+st.set_page_config(page_title="Salary Prediction App", page_icon="💼")
 st.title("💼 Salary Prediction App")
 
 # ==============================
-# User Inputs
+# File paths
 # ==============================
-age = st.number_input("Age", min_value=18, max_value=65, value=25)
-
-gender = st.selectbox(
-    "Gender",
-    encoders["gender"].classes_
-)
-
-education = st.selectbox(
-    "Education Level",
-    encoders["education"].classes_
-)
-
-job = st.selectbox(
-    "Job Title",
-    encoders["job"].classes_
-)
-
-experience = st.number_input(
-    "Years of Experience",
-    min_value=0.0,
-    max_value=40.0,
-    value=2.0
-)
+MODEL_PATH = "salary_prediction_model(1).pk1"
+ENCODER_PATH = "label_encoder_sp.pkl"
 
 # ==============================
-# Create Input DataFrame
+# Check files exist
 # ==============================
-input_df = pd.DataFrame({
-    "age": [age],
-    "gender": [gender],
-    "education": [education],
-    "job": [job],
-    "Years of Experience": [experience]
-})
+if not os.path.exists(MODEL_PATH):
+    st.error(f"❌ Model file not found: {MODEL_PATH}")
+    st.write("Files in current directory:", os.listdir())
+    st.stop()
+
+if not os.path.exists(ENCODER_PATH):
+    st.error(f"❌ Encoder file not found: {ENCODER_PATH}")
+    st.write("Files in current directory:", os.listdir())
+    st.stop()
 
 # ==============================
-# Prediction
+# Load model & encoders
 # ==============================
-if st.button("Predict Salary"):
-    # Encode categorical columns
-    input_df["gender"] = encoders["gender"].transform(input_df["gender"])
-    input_df["education"] = encoders["education"].transform(input_df["education"])
-    input_df["job"] = encoders["job"].transform(input_df["job"])
+model = joblib.load(MODEL_PATH)
+encoders = joblib.load(ENCODER_PATH)
 
-    # Predict
-    prediction = model.predict(input_df)
-
-    # Result label (optional)
-    result = "High Salary" if prediction[0] > 50000 else "Low Salary"
-
-    # Display results
-    st.success(f"💰 Predicted Salary: ₹{prediction[0]:,.2f}")
-    st.info(f"📊 Result: {result}")
+# ==============================
+# User inputs
+# ==============================
+age = st.number_input("Age", min_value=18, max_val_
