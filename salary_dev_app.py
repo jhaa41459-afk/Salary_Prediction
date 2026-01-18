@@ -20,7 +20,7 @@ age= st.number_input("age",18,65,25)
 gender= st.selectbox("gender",("male","female"))
 education st.selectbox("Education Level", encoders ["Education Level"].classes)
 
-job st.selectbox("Job Title", encoders Job Title" classes_)
+job st.selectbox("Job Title", encoders ["Job Title"].classes)
 
 experience st.number Input("Years of Experience", 0.0, 40.8, 2.0)
 df=pd.DataFrame({
